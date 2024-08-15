@@ -59,8 +59,8 @@ func (pr *ProductRepository) GetProductById(produtoId int) (*model.Product, erro
 
 	err = query.QueryRow(produtoId).Scan(
 		&productObj.ID,
-		productObj.Name,
-		productObj.Price,
+		&productObj.Name,
+		&productObj.Price,
 	)
 
 	if err != nil {

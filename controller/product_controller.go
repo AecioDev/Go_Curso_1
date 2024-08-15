@@ -54,7 +54,10 @@ func (p *productController) GetProductById(ctx *gin.Context) {
 	product, err := p.productUsecase.GetProductById(productId)
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+		response := model.Response{
+			Message: "Erro ao obter o produto: " + err.Error(),
+		}
+		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
