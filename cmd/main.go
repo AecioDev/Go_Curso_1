@@ -27,13 +27,9 @@ func main() {
 	//Camada de Controllers
 	ProductController := controller.NewProductController(ProductUsecase)
 
-	server.GET("/ping", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-
 	server.GET("/products", ProductController.GetProducts)
+	server.POST("/product", ProductController.CreateProduct)
+	server.GET("/product/:id", ProductController.GetProductById)
 
 	server.Run(":8000")
 

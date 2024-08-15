@@ -37,20 +37,63 @@ func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
 			fmt.Println(err)
 			return []model.Product{}, err
 		}
-	}
 
-	productList = append(productList, productObj)
+		productList = append(productList, productObj)
+
+	}
 
 	rows.Close()
 
 	return productList, nil
 }
 
-func (pr *ProductRepository) CreateProduct(product model.Product) error {
+func (pr *ProductRepository) GetProductById(produtoId int) (*model.Product, error) {
+
+	query, err := pr.connection.Prepare("SELECT * FROM product Where id = $1")
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	var productObj model.Product
+
+	err = query.QueryRow(produtoId).Scan(
+		&productObj.ID,
+		productObj.Name,
+		productObj.Price,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	query.Close()
+
+	return &productObj, nil
+}
+
+func (pr *ProductRepository) CreateProduct(product model.Product) (int, error) {
 
 	var id int
 	query, err := pr.connection.Prepare("INSERT INTO product" +
 		"(product_name, price)" +
-		"VALUES ($11 $2) RETURNING id")
+		"VALUES ($1, $2) RETURNING id")
+	if err != nil {
+		fmt.Println(err)
+		return 0, err
+	}
 
+	err = query.QueryRow(product.Name, product.Price).Scan(&id)
+	if err != nil {
+		fmt.Println(err)
+		return 0, err
+	}
+
+	query.Close()
+
+	return id, nil
 }
